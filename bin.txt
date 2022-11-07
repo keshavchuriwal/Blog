@@ -1,0 +1,151 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+using Oracle.ManagedDataAccess.Client;
+using Oracle.ManagedDataAccess.Types;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+
+
+
+namespace Connection
+{
+    public partial class Form1 : Form
+    {
+        OracleConnection conn;
+        OracleCommand comm;
+        OracleDataAdapter da;
+        DataSet ds;
+        DataTable dt;
+        DataRow dr;
+        int i = 0;
+        public Form1()
+        {
+            InitializeComponent();
+        }
+        void Connection()
+        {
+            conn = new OracleConnection("Data Source=RaviSharma;User ID=system;Password=system");
+            conn.Open();
+
+        }
+
+
+
+       private void Form1_Load(object sender, EventArgs e)
+        {
+
+
+
+       }
+
+
+
+       private void button1_Click(object sender, EventArgs e)
+        {
+            Connection();
+            MessageBox.Show("Connected");
+        }
+
+
+
+       private void button2_Click(object sender, EventArgs e)
+        {
+            Connection();
+            comm = new OracleCommand();
+            comm.CommandText = "select * from person";
+            comm.CommandType = CommandType.Text;
+            ds = new DataSet();
+            da = new OracleDataAdapter(comm.CommandText, conn);
+            da.Fill(ds, "Tbl_person");
+           
+            dt = ds.Tables["Tbl_person"];
+            int t = dt.Rows.Count;
+            MessageBox.Show(t.ToString());
+            dr = dt.Rows[i];
+            textBox1.Text = dr["id"].ToString();
+            textBox2.Text = dr["name"].ToString();
+            textBox3.Text = dr["address"].ToString();
+            conn.Close();
+        }
+
+
+
+       private void button3_Click(object sender, EventArgs e)
+        {
+            i++;
+            if (i >= dt.Rows.Count)
+                i = 0;
+            dr = dt.Rows[i];
+            textBox1.Text = dr["id"].ToString();
+            textBox2.Text = dr["name"].ToString();
+            textBox3.Text = dr["address"].ToString();
+        }
+
+
+
+       private void button4_Click(object sender, EventArgs e)
+        {
+            i--;
+            if (i < 0)
+                i = dt.Rows.Count - 1;
+            dr = dt.Rows[i];
+            textBox1.Text = dr["id"].ToString();
+            textBox2.Text = dr["name"].ToString();
+            textBox3.Text = dr["address"].ToString();
+        }
+
+
+
+       private void button5_Click(object sender, EventArgs e)
+        {
+            Connection();
+            //int id = int.Parse(textBox1.Text);
+            OracleCommand cm = new OracleCommand();
+            cm.Connection = conn;
+            cm.CommandText = "insert into person values('"+ textBox1.Text +"','" + textBox2.Text + "','" + textBox3.Text + "')";
+            cm.CommandType = CommandType.Text;
+            cm.ExecuteNonQuery();
+            MessageBox.Show("Inserted!");
+            conn.Close();
+        }
+
+
+
+       private void button6_Click(object sender, EventArgs e)
+        {
+            Connection();
+            OracleCommand cm = new OracleCommand();
+            cm.Connection = conn;
+            cm.CommandText = "update person set address='"+ textBox1.Text + "' where name ='"+ textBox2.Text +"'";
+            cm.CommandType = CommandType.Text;           
+            cm.ExecuteNonQuery();
+            MessageBox.Show("updated");
+            conn.Close();
+        }
+
+
+
+       private void button7_Click(object sender, EventArgs e)
+        {
+            Connection();
+            comm = new OracleCommand();
+            comm.CommandText = "select * from person";
+            comm.CommandType = CommandType.Text;
+            ds = new DataSet();
+            da = new OracleDataAdapter(comm.CommandText, conn);
+            da.Fill(ds, "person");
+            dt = ds.Tables["person"];
+            dr = dt.Rows[i];
+            dataGridView1.DataSource = ds;
+            dataGridView1.DataMember = "person";
+            conn.Close();
+        }
+    }
+}
